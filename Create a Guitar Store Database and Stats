@@ -1,0 +1,29 @@
+CREATE TABLE Guitar_Store_Products (id INTEGER PRIMARY KEY, name TEXT, brand TEXT, sale_price INTEGER, profit_margin INTEGER);
+
+INSERT INTO Guitar_Store_Products VALUES (1, "Les_Paul", "Gibson", 2500, 300);
+INSERT INTO Guitar_Store_Products VALUES (2, "SG", "Gibson", 2000, 300);
+INSERT INTO Guitar_Store_Products VALUES (3, "Stratocaster", "Fender", 1600, 350);
+INSERT INTO Guitar_Store_Products VALUES (4, "Telecaster", "Fender", 1600, 350);
+INSERT INTO Guitar_Store_Products VALUES (5, "Jaguar", "Fender", 1700, 300);
+INSERT INTO Guitar_Store_Products VALUES (6, "Mustang", "Fender", 1700, 300);
+INSERT INTO Guitar_Store_Products VALUES (7, "Custom 24", "PRS", 3600, 400);
+INSERT INTO Guitar_Store_Products VALUES (8, "Silver Sky", "PRS", 2600, 400);
+INSERT INTO Guitar_Store_Products VALUES (9, "McCarty_594", "PRS", 3200, 450);
+INSERT INTO Guitar_Store_Products VALUES (10, "H150", "Heritage", 2600, 300);
+INSERT INTO Guitar_Store_Products VALUES (11, "H350", "Heritage", 3300, 300);
+INSERT INTO Guitar_Store_Products VALUES (12, "Stratocaster", "Squier", 350, 75);
+INSERT INTO Guitar_Store_Products VALUES (13, "Telecaster", "Squier", 350, 75);
+INSERT INTO Guitar_Store_Products VALUES (14, "Les_Paul", "Epiphone", 550, 110);
+INSERT INTO Guitar_Store_Products VALUES (15, "SG", "Epiphone", 475, 95);
+
+--which guitars have a profit margin greater than 300?
+SELECT * FROM Guitar_Store_Products 
+  WHERE profit_margin>300 order by profit_margin;
+
+--order the guitars from highest profit margin to lowest
+SELECT * FROM Guitar_Store_Products
+    ORDER BY profit_margin desc;
+
+--which guitar was the most popular?
+SELECT name, brand, MAX(amount_sold)
+  FROM Guitar_Store_Products
