@@ -1,0 +1,41 @@
+#Here, I'm using Spotify data downloaded from Kaggle.com, and inserting it into a database.
+#Then, I'm querying the table and performing analytics using SQL.
+
+#Creating the Table:
+CREATE TABLE BIT_DB.Spotifydata (
+id integer PRIMARY KEY,
+artist_name varchar NOT NULL,
+track_name varchar NOT NULL,
+track_id varchar NOT NULL,
+popularity integer NOT NULL,
+danceability decimal(4,3) NOT NULL,
+energy decimal(4,3) NOT NULL,
+song_key integer NOT NULL,
+loudness decimal(5,3) NOT NULL,
+song_mode integer NOT NULL,
+speechiness decimal(5,4) NOT NULL,
+acousticness decimal(6,5) NOT NULL,
+instrumentalness decimal(8,7) NOT NULL,
+liveness decimal(5,4) NOT NULL,
+valence decimal(4,3) NOT NULL,
+tempo decimal(6,3) NOT NULL,
+duration_ms integer NOT NULL,
+time_signature integer NOT NULL )
+
+
+#Here, I'm organizing each artist and finding the average duration, tempo, danceability of each of their songs,
+#and sorting them by their popularity.
+SELECT artist_name,
+AVG(duration_ms),
+AVG(tempo),
+AVG(danceability),
+AVG(popularity)
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+ORDER BY AVG(popularity) desc;
+
+#Here, I'm finding the top 5 most popular tracks of 2021.
+SELECT artist_name, track_name, popularity
+FROM BIT_DB.Spotifydata
+ORDER BY popularity desc
+LIMIT 5;
