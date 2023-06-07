@@ -1,0 +1,139 @@
+#Here, I've downloaded a database showing sales information for a music distribution company.
+  The data includes sales invoices specifying the customer and sales agents involved in the sale,
+  as well as the information for each individual track, such as Artist, Track Name, Genre, etc.
+  
+#Then, I'm writing queries in SQL to analyze the data in order to answer any questions one may have on the information.
+  
+/* Show Customers (their full names, customer ID, and country) who are not in the US */
+
+SELECT LastName, FirstName, CustomerId, Country
+FROM chinook.customers
+WHERE Country != "USA";
+
+/* Show only the customers from Brazil */
+
+SELECT LastName, FirstName, CustomerId
+FROM chinook.customers
+WHERE Country = "Brazil";
+
+/* Find the Invoices of customers who are from Brazil. The resulting table should show
+the customer's full name, Invoice ID, Date of the invoice, and billing country. */
+
+SELECT cust.LastName, cust.FirstName, inv.InvoiceId, Inv.InvoiceDate, Inv.BillingCountry
+FROM chinook.customers AS cust
+JOIN chinook.invoices AS Inv
+    ON cust.CustomerId = Inv.CustomerId
+WHERE cust.Country = "Brazil";
+
+/* Show the employees who work in Sales */
+
+SELECT EmployeeId, LastName, FirstName, Title
+FROM chinook.employees
+WHERE Title LIKE "%sale%";
+
+/* Show a unique/distinct list of billing countries from the invoice table. */
+
+SELECT distinct BillingCountry
+FROM chinook.invoices;
+
+/* Now show the amount of invoices associated with each billing country, sorted from highest to lowest volume. */
+
+SELECT BillingCountry, COUNT(InvoiceId) AS "Total_Orders"
+FROM chinook.invoices
+GROUP BY BillingCountry
+ORDER BY COUNT(InvoiceId) desc;
+
+/* Provide a query that shows the invoices associated with each sales agent.
+The resulting table should include the sales agent's full name. */
+
+SELECT emp.LastName, emp.FirstName, inv.InvoiceId
+FROM chinook.employees emp
+JOIN chinook.customers cust ON cust.SupportRepId = emp.EmployeeId
+JOIN chinook.invoices inv ON cust.CustomerId = inv.InvoiceId;
+
+/*Show the Invoice Total, Customer name, Country, and Sales Agent name for all invoices and customers. */
+
+SELECT cust.CustomerId, cust.LastName AS "Customer Last Name", cust.FirstName AS "Customer First Name", cust.Country, 
+emp.LastName AS "Sales Rep Last Name", emp.FirstName AS "Sales Rep First Name", inv.Total
+FROM chinook.customers cust
+JOIN chinook.employees emp ON cust.SupportRepId = emp.EmployeeId
+JOIN chinook.invoices inv ON cust.CustomerId = inv.InvoiceId
+GROUP BY cust.CustomerId;
+
+/* How many invoices were there in 2009? */
+SELECT COUNT(*)
+FROM chinook.invoices
+WHERE InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31';
+
+/* What were the total sales for 2009? */
+
+SELECT SUM(Total)
+FROM chinook.invoices
+WHERE InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31';
+
+/* Write a query that includes the purchased track name with each invoice line ID. */
+
+SELECT tracks.name, invi.InvoiceLineId
+FROM chinook.invoice_items invi
+JOIN chinook.tracks ON tracks.TrackId = invi.TrackId;
+
+/* Provide a query that shows all the Tracks, including the Album name, Media type, and Genre. */
+
+SELECT t.Name AS "Track Title", a.Title AS "Album Title", m.Name AS "Media Type", g.Name AS "Genre"
+FROM chinook.tracks t
+JOIN chinook.albums a ON t.AlbumId = a.AlbumId
+JOIN chinook.media_types m ON t.MediaTypeId = m.MediaTypeId
+JOIN chinook.genres g ON t.GenreId = g.GenreId;
+
+/* Show the total sales made by each sales agent. */
+
+SELECT emp.LastName, emp.FirstName, ROUND(SUM(inv.Total), 2) AS 'Total Sales'
+FROM chinook.employees emp
+JOIN chinook.customers cust ON cust.SupportRepId = emp.EmployeeId
+JOIN chinook.invoices inv ON inv.CustomerId = cust.CustomerId
+WHERE emp.Title = 'Sales Support Agent'
+GROUP BY emp.FirstName;
+
+/* Which sales agent made the most dollars in sales in 2009? */
+
+SELECT emp.LastName, emp.FirstName, ROUND(SUM(inv.Total), 2) AS 'Total Sales'
+FROM chinook.employees emp
+JOIN chinook.customers cust ON cust.SupportRepId = emp.EmployeeId
+JOIN chinook.invoices inv ON inv.CustomerId = cust.CustomerId
+WHERE emp.Title = 'Sales Support Agent'
+AND inv.InvoiceDate BETWEEN '2009-01-01' AND '2009-12-31'
+GROUP BY emp.FirstName
+LIMIT 1;
+
+/* Write a query showing the total tracks per genre. */
+
+SELECT g.Name, COUNT (t.TrackId)
+FROM chinook.genres g
+JOIN chinook.tracks t ON g.GenreId = t.GenreId
+GROUP BY g.Name;
+
+/* Which genre of music yielded the highest amount of money? */
+
+SELECT g.Name AS "Genre", ROUND(SUM(inv.Total), 3) AS "Total Sales"
+FROM chinook.genres g
+JOIN chinook.tracks t ON t.GenreId = g.GenreId
+JOIN chinook.invoice_items invi ON invi.TrackId = t.TrackId
+JOIN chinook.invoices inv ON inv.InvoiceId = invi.InvoiceId
+GROUP BY g.Name
+ORDER BY SUM(inv.Total) desc
+LIMIT 1;
+
+/* How long in minutes is the average track? */
+
+SELECT ROUND(AVG(Milliseconds)/60000, 3) AS "average length"
+FROM chinook.tracks;
+
+/* Write a query showing the number of tracks and the length in minutes of each playlist. */
+
+SELECT p.PlaylistId, p.Name AS "Playlist Name", 
+    ROUND(SUM(t.Milliseconds)/60000, 3) AS "Playlist Length",
+    COUNT(pt.TrackId) AS "Number of Tracks"
+FROM chinook.playlists p
+JOIN chinook.playlist_track pt ON p.PlaylistId = pt.PlaylistId
+JOIN chinook.tracks t ON pt.TrackId = t.TrackId
+GROUP BY p.PlaylistId;
